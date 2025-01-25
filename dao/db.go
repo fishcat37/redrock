@@ -9,11 +9,13 @@ import (
 
 var DBUser *gorm.DB
 
-func InitDB() {
+func InitDB() error {
 	dsn := "root:072231@tcp(127.0.0.1:3306)/first?charset=utf8&parseTime=True&loc=Local"
-	DBUser, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	var err error
+	DBUser, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return err
 	}
 	DBUser.AutoMigrate(&model.User{})
+	return nil
 }
