@@ -87,16 +87,15 @@ func Refresh(c *gin.Context) {
 	}
 	info := model.User{
 		Username: claims1.Username,
-		Password: claims1.Password,
 	}
 	token, err := services.CreateToken(info)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成访问令牌失败"})
+		c.JSON(500, gin.H{"error": "生成访问令牌失败"})
 		return
 	}
 	refreshToken, err := services.CreateRefreshToken(info)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "生成刷新令牌失败"})
+		c.JSON(500, gin.H{"error": "生成刷新令牌失败"})
 		return
 	}
 	c.JSON(200, gin.H{
@@ -117,8 +116,8 @@ func Password(c *gin.Context) {
 		return
 	}
 	user := model.User{
+		ID:       claims.ID,
 		Username: claims.Username,
-		Password: claims.Password,
 	}
 	flag, _ := dao.FindUser(&user)
 	if !flag {
@@ -152,7 +151,7 @@ func GetInfo(c *gin.Context) {
 		c.JSON(500, gin.H{"message": "查找错误或用户不存在"})
 		return
 	}
-	if err != nil || claims.Username != user.Username || claims.Password != user.Password {
+	if err != nil || claims.Username != user.Username {
 		c.JSON(401, gin.H{"message": "Token 错误"})
 		return
 	}
@@ -160,5 +159,22 @@ func GetInfo(c *gin.Context) {
 }
 
 func UpdateInfo(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	var user model.User
+	if err := c.BindJSON(&user); err != nil {
+		return
+	}
+	claims, err := services.ParseToken(token)
+	if err != nil {
+		c.JSON(401, gin.H{"message": "Token 错误"})
+		return
+	}
+	user.Username = claims.Username
+	err = dao.UpdateUser(&user)
+	if err != nil {
+		c.JSON(500, gin.H{"message": "更新信息失败"})
+		return
+	}
+	c.JSON(200, gin.H{"status": 10000, "info": "success", "data": user})
 
 }

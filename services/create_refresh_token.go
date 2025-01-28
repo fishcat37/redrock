@@ -2,6 +2,7 @@ package services
 
 import (
 	"redrock/config"
+	"redrock/dao"
 	"redrock/model"
 	"time"
 
@@ -9,9 +10,15 @@ import (
 )
 
 func CreateRefreshToken(user model.User) (string, error) {
+	existingUser, isTrue := dao.FindUser(&user)
+	if !existingUser {
+		panic("用户不存在")
+	} else if !isTrue {
+		panic("查找错误")
+	}
 	claims := model.CustomClaims{
+		ID:       user.ID,
 		Username: user.Username,
-		Password: user.Password,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24 小时后过期
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
