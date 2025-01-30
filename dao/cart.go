@@ -27,3 +27,11 @@ func AddCart(user model.User, product model.Product) error {
 	result = DBCart.Model(&cart).Where("user_id = ? AND product_id = ?", user.ID, product.ID).Update("quantity", gorm.Expr("quantity + 1"))
 	return result.Error
 }
+func GetCartProduct(user model.User) ([]model.Cart, error) {
+	var cart []model.Cart
+	result := DBCart.Model(&cart).Preload("Product").Where("user_id = ?", user.ID).Find(&cart)
+	if result.RowsAffected == 0 {
+		return cart, result.Error
+	}
+	return cart, nil
+}

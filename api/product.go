@@ -73,3 +73,28 @@ func AddCart(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"status": 10000, "info": "success"})
 }
+
+func Cart(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	claims, err := services.ParseToken(token)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	user := model.User{}
+	var id uint64
+	id, err = strconv.ParseUint(c.PostForm("product_id"), 10, 0)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	user.Username = claims.Username
+	user.ID = uint(id)
+	var carts []model.Cart
+	carts, err = dao.GetCartProduct(user)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"status": 10000, "info": "success", "data": carts})
+}
