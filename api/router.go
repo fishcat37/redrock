@@ -16,4 +16,5 @@ func Router(r *gin.Engine) {
 	r.GET("/book/search", Search)
 	r.PUT("/product/AddCart", AddCart)
 	r.GET("product/cart", Cart)
+	r.GET("/product/info/:product_id", GetProductInfo)
 }

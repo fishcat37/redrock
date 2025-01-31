@@ -34,3 +34,11 @@ func FindProduct(product *model.Product) error {
 	}
 	return nil
 }
+
+func FindProductById(product *model.Product) error {
+	result := DBProduct.Model(product).Where("id = ?", product.ID).First(product)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

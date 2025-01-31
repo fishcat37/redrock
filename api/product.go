@@ -98,3 +98,16 @@ func Cart(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"status": 10000, "info": "success", "data": carts})
 }
+
+func GetProductInfo(c *gin.Context) {
+	var product model.Product
+	if err := c.BindUri(&product); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	if err := dao.FindProduct(&product); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"status": 10000, "info": "success", "data": product})
+}
