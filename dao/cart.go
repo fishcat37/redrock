@@ -14,7 +14,10 @@ func InitCart(dsn string) error {
 	if err != nil {
 		return err
 	}
-	DBCart.AutoMigrate(&model.Cart{})
+	err = DBCart.AutoMigrate(&model.Cart{})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -11,5 +11,11 @@ func InitDB() error {
 	if err := InitCart(dsn); err != nil {
 		return err
 	}
+	if err := InitComment(dsn); err != nil {
+		return err
+	}
+	if err := InitOrder(dsn); err != nil {
+		return err
+	}
 	return nil
 }

@@ -15,7 +15,10 @@ func InitUsers(dsn string) error {
 	if err != nil {
 		return err
 	}
-	DBUser.AutoMigrate(&model.User{})
+	err = DBUser.AutoMigrate(&model.User{})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func FindUser(user *model.User) (bool, bool) {

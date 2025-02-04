@@ -15,7 +15,10 @@ func InitProduct(dsn string) error {
 	if err != nil {
 		return err
 	}
-	DBProduct.AutoMigrate(&model.Product{})
+	err = DBProduct.AutoMigrate(&model.Product{})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
