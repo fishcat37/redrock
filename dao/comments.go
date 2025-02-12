@@ -2,9 +2,11 @@ package dao
 
 import (
 	"fmt"
+	"redrock/model"
+	"time"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"redrock/model"
 )
 
 var DBComment *gorm.DB
@@ -15,7 +17,7 @@ func InitComment(dsn string) error {
 	if err != nil {
 		return err
 	}
-	err = DBComment.AutoMigrate(&model.Product{})
+	err = DBComment.AutoMigrate(&model.Comment{})
 	if err != nil {
 		return err
 	}
@@ -34,6 +36,7 @@ func GetComment(comment model.Comment) ([]model.Comment, error) {
 }
 
 func AddComment(comment *model.Comment) error {
+	comment.PublishTime = time.Now()
 	result := DBComment.Model(&model.Comment{}).Create(&comment)
 	return result.Error
 }

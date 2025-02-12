@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"redrock/model"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"redrock/model"
 	// "gorm.io/gorm"
 )
 
@@ -22,8 +23,8 @@ func InitProduct(dsn string) error {
 	return nil
 }
 
-func GetProductList(products []model.Product) error {
-	result := DBProduct.Model(&model.Product{}).Find(&products)
+func GetProductList(products *[]model.Product) error {
+	result := DBProduct.Model(&model.Product{}).Find(products)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -31,7 +32,7 @@ func GetProductList(products []model.Product) error {
 }
 
 func FindProduct(product *model.Product) error {
-	result := DBProduct.Model(product).Where("name = ?", product.Name).First(product)
+	result := DBProduct.Model(product).Where("name = ? OR id = ?", product.Name, product.ID).First(product)
 	if result.Error != nil {
 		return result.Error
 	}

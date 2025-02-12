@@ -162,6 +162,7 @@ func UpdateInfo(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	var user model.User
 	if err := c.BindJSON(&user); err != nil {
+		c.JSON(400, gin.H{"message": "参数错误"})
 		return
 	}
 	claims, err := services.ParseToken(token)

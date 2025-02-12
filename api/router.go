@@ -11,7 +11,7 @@ func Router(r *gin.Engine) {
 		user.POST("/token", Token)
 		user.GET("/token/refresh", Refresh)
 		user.PUT("/password", Password)
-		user.GET("info/:user_id", GetInfo)
+		user.GET("/info/:user_id", GetInfo)
 		user.PUT("/info", UpdateInfo)
 	}
 	product := r.Group("/product")

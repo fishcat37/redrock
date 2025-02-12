@@ -1,16 +1,17 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
 	"redrock/dao"
 	"redrock/model"
 	"redrock/services"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 func List(c *gin.Context) {
 	var products []model.Product
-	if err := dao.GetProductList(products); err != nil {
+	if err := dao.GetProductList(&products); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
@@ -51,6 +52,7 @@ func AddCart(c *gin.Context) {
 	claims, err := services.ParseToken(token)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "token解析出错"})
+		return
 	}
 	user := model.User{
 		ID:       claims.ID,
@@ -61,15 +63,18 @@ func AddCart(c *gin.Context) {
 	id, err = strconv.ParseUint(c.PostForm("product_id"), 10, 0)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 	product.ID = uint(id)
 	err = dao.FindProduct(&product)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
+		return
 	}
 	err = dao.AddCart(user, product)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(200, gin.H{"status": 10000, "info": "success"})
 }
@@ -82,14 +87,21 @@ func Cart(c *gin.Context) {
 		return
 	}
 	user := model.User{}
-	var id uint64
-	id, err = strconv.ParseUint(c.PostForm("product_id"), 10, 0)
+	// var id uint64
+
+	// id, err = strconv.ParseUint(c.PostForm("user_id"), 10, 0)
+	// if err != nil {
+	// 	c.JSON(500, gin.H{"error": err.Error()})
+	// 	return
+	// }
+	// user.Username = claims.Username
+	// user.ID = uint(id)
+	err = c.BindQuery(&user)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 	user.Username = claims.Username
-	user.ID = uint(id)
 	var carts []model.Cart
 	carts, err = dao.GetCartProduct(user)
 	if err != nil {

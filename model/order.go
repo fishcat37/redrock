@@ -3,14 +3,15 @@ package model
 import "time"
 
 type Order struct {
-	ID      uint     `gorm:"primary_key"`
-	UserID  uint     `json:"user_id"`
-	Orders  []Orders `json:"orders"`
-	Address string   `json:"address"`
-	Total   uint     `json:"total"`
+	ID       uint             `gorm:"primary_key"`
+	UserID   uint             `json:"user_id"`
+	Products []OrderedProduct `json:"orders" gorm:"foreignKey:OrderID"`
+	Address  string           `json:"address"`
+	Total    uint             `json:"total"`
 }
-type Orders struct {
-	ProductID   uint      `json:"product_id"`
+type OrderedProduct struct {
+	ID          uint      `json:"product_id" gorm:"primary_key"`
+	OrderID     uint      `json:"order_id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Type        string    `json:"type"`
@@ -20,5 +21,5 @@ type Orders struct {
 	Cover       string    `json:"cover"`
 	PublishTime time.Time `json:"publish_time"`
 	Link        string    `json:"link"`
-	Count       int       `json:"count" gorm:"count;default:1"`
+	Count       int       `json:"count" gorm:"default:1"`
 }

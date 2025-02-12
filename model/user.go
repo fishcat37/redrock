@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID           uint      `json:"id" gorm:"primary_key" uri:"user_id"`
+	ID           uint      `json:"id" uri:"user_id" gorm:"primary_key"`
 	Username     string    `json:"username"`
 	Password     string    `json:"password"`
 	Nickname     string    `json:"nickname"`
@@ -15,7 +15,7 @@ type User struct {
 	QQ           string    `json:"qq"`
 	Gender       string    `json:"gender"`
 	Email        string    `json:"email"`
-	Birthday     time.Time `gorm:"type:date;default:CURRENT_DATE" json:"birthday"`
+	Birthday     time.Time `json:"birthday" gorm:"type:date;default:'2000-01-01'"`
 }
 type Token struct {
 	Token        string `json:"token"`
