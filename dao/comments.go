@@ -2,31 +2,14 @@ package dao
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 	"redrock/model"
 	"time"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
-
-var DBComment *gorm.DB
-
-func InitComment(dsn string) error {
-	var err error
-	DBComment, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-	err = DBComment.AutoMigrate(&model.Comment{})
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func GetComment(comment model.Comment) ([]model.Comment, error) {
 	var comments []model.Comment
-	result := DBComment.Model(&model.Comment{}).Where("product_id = ?", comment.ProductID).Find(&comments)
+	result := DB.Model(&model.Comment{}).Where("product_id = ?", comment.ProductID).Find(&comments)
 	if result.RowsAffected == 0 {
 		return []model.Comment{}, nil
 	} else if result.Error != nil {
@@ -37,32 +20,45 @@ func GetComment(comment model.Comment) ([]model.Comment, error) {
 
 func AddComment(comment *model.Comment) error {
 	comment.PublishTime = time.Now()
-	result := DBComment.Model(&model.Comment{}).Create(&comment)
+	err := FindProductById(comment.ProductID)
+	if err != nil {
+		return fmt.Errorf("product %v does not exist", comment.ProductID)
+	}
+	result := DB.Model(&model.Comment{}).Create(&comment)
 	return result.Error
 }
 
 func DeleteComment(comment model.Comment) error {
-	result := DBComment.Model(&model.Comment{}).Where("id = ?", comment.ID).Delete(&comment)
+	result := DB.Model(&model.Comment{}).Where("id = ?", comment.ID).Delete(&comment)
+	if result.RowsAffected == 0 {
+		return fmt.Errorf(fmt.Sprintf("comment %v does not exist", comment.ID))
+	}
 	return result.Error
 }
 
 func UpdateComment(comment *model.Comment) error {
-	result := DBComment.Model(&model.Comment{}).Where("id = ?", comment.ID).Update("content", comment.Content)
+	result := DB.Model(&model.Comment{}).Where("id = ? AND user_id = ?", comment.ID, comment.UserID).Update("content", comment.Content)
+	if result.RowsAffected == 0 {
+		return fmt.Errorf(fmt.Sprintf("your comment %v does not exist", comment.ID))
+	}
 	return result.Error
 }
 
 func Praise(praise model.Praise) error {
 	if praise.Model == 1 {
-		result := DBComment.Model(&model.Comment{}).Where("comment_id = ?", praise.CommentID).Update("praise_count", gorm.Expr("praise_count + 1"))
+		result := DB.Model(&model.Comment{}).Where("id = ?", praise.CommentID).Update("praise_count", gorm.Expr("praise_count + 1"))
+		if result.RowsAffected == 0 {
+			return fmt.Errorf(fmt.Sprintf("comment %v does not exist", praise.CommentID))
+		}
 		return result.Error
 	} else if praise.Model == 2 {
 		var comment model.Comment
-		result := DBComment.Model(&model.Comment{}).Where("comment_id = ?", praise.CommentID).First(&comment)
+		result := DB.Model(&model.Comment{}).Where("id = ?", praise.CommentID).First(&comment)
 		if result.RowsAffected == 0 {
-			return result.Error
+			return fmt.Errorf(fmt.Sprintf("comment %v does not exist", praise.CommentID))
 		}
 		if comment.PraiseCount != 0 {
-			result = DBComment.Model(&model.Comment{}).Where("comment_id = ?", praise.CommentID).Update("praise_count", gorm.Expr("praise_count - 1"))
+			result = DB.Model(&model.Comment{}).Where("id = ?", praise.CommentID).Update("praise_count", gorm.Expr("praise_count - 1"))
 			return result.Error
 		} else {
 			return fmt.Errorf("点赞已为零，无法降低")

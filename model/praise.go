@@ -1,6 +1,6 @@
 package model
 
 type Praise struct {
-	Model     int  `json:"model"`
-	CommentID uint `json:"comment_id"`
+	Model     int  `form:"model"`
+	CommentID uint `form:"comment_id"`
 }

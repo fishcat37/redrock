@@ -1,28 +1,22 @@
 package dao
 
 import (
-	"redrock/model"
-
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"redrock/model"
 )
 
-var DBOrder *gorm.DB
-
-func InitOrder(dsn string) error {
-	var err error
-	DBOrder, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-	err = DBOrder.AutoMigrate(&model.Order{})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func AddOrder(order *model.Order) error {
-	result := DBOrder.Model(&model.Order{}).Create(order)
-	return result.Error
+	return DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(order).Error; err != nil {
+			return err
+		}
+		for i := range order.Products {
+			order.Products[i].OrderID = order.ID
+			order.Products[i].ID = 0
+		}
+		if err := tx.Create(&order.Products).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }

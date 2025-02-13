@@ -1,4 +1,4 @@
-package services
+package utils
 
 import (
 	"redrock/config"
@@ -24,7 +24,7 @@ func CreateRefreshToken(user model.User) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    config.Issuer,
-			Subject:   config.Subject,
+			Subject:   user.Username,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

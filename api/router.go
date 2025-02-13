@@ -2,33 +2,35 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"redrock/service"
 )
 
 func Router(r *gin.Engine) {
 	user := r.Group("/user")
 	{
-		user.POST("/register", Register)
-		user.POST("/token", Token)
-		user.GET("/token/refresh", Refresh)
-		user.PUT("/password", Password)
-		user.GET("/info/:user_id", GetInfo)
-		user.PUT("/info", UpdateInfo)
+		user.POST("/register", service.Register)
+		user.POST("/token", service.Token)
+		user.GET("/token/refresh", service.Refresh)
+		user.PUT("/password", service.Password)
+		user.GET("/info/:user_id", service.GetInfo)
+		user.PUT("/info", service.UpdateInfo)
 	}
 	product := r.Group("/product")
 	{
-		product.GET("/list", List)
-		product.GET("/search", Search)
-		product.PUT("/AddCart", AddCart)
-		product.GET("/cart", Cart)
-		product.GET("/info/:product_id", GetProductInfo)
+		product.GET("/list", service.List)
+		product.GET("/search", service.Search)
+		product.PUT("/AddCart", service.AddCart)
+		product.GET("/cart", service.Cart)
+		product.GET("/info/:product_id", service.GetProductInfo)
+		product.GET("/:type", service.GetInfoByType)
 	}
 	comment := r.Group("/comment")
 	{
-		comment.GET("/:product_id", GetComment)
-		comment.POST("/:product_id", AddComment)
-		comment.DELETE("/:comment_id", DeleteComment)
-		comment.PUT(":comment_id", UpdateComment)
-		comment.PUT("/praise", Praise)
+		comment.GET("/:product_id", service.GetComment)
+		comment.POST("/:product_id", service.AddComment)
+		comment.DELETE("/:comment_id", service.DeleteComment)
+		comment.PUT("/:comment_id", service.UpdateComment)
+		comment.PUT("/praise", service.Praise)
 	}
-	r.POST("operate/order", Order)
+	r.POST("operate/order", service.Order)
 }

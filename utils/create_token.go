@@ -1,12 +1,11 @@
-package services
+package utils
 
 import (
+	"github.com/golang-jwt/jwt/v5"
 	"redrock/config"
 	"redrock/dao"
 	"redrock/model"
 	"time"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func CreateToken(user model.User) (string, error) {
@@ -23,8 +22,8 @@ func CreateToken(user model.User) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)), //1小时过期
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    config.Issuer,
-			Subject:   config.Subject,
+			Issuer:    config.Issuer, //签发者
+			Subject:   user.Username, //主题
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

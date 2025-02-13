@@ -5,5 +5,5 @@ type Cart struct {
 	UserID    uint    `gorm:"user_id"`
 	ProductID uint    `gorm:"product_id"`
 	Quantity  uint    `gorm:"default:1"`
-	Product   Product `gorm:"foreignKey:ProductID;references:ID"`
+	Product   Product `gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 }

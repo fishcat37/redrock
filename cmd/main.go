@@ -8,14 +8,18 @@ import (
 )
 
 func main() {
-	// 3. 初始化数据库
-	err := dao.InitDB()
+	err := dao.InitSQL()
 	if err != nil {
 		panic(err)
 	}
-	// 4. 注册路由
+
+	err = dao.InitRedis()
+	if err != nil {
+		panic(err)
+	}
+
 	r := gin.Default()
-	// 5. 启动服务
+
 	api.Router(r)
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
