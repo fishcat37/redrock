@@ -20,7 +20,7 @@ func CreateRefreshToken(user model.User) (string, error) {
 		ID:       user.ID,
 		Username: user.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // 24 小时后过期
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)), // 24 小时后过期
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    config.Issuer,

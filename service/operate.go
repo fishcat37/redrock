@@ -1,12 +1,12 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
+	"redrock/config"
 	"redrock/dao"
 	"redrock/model"
 	"redrock/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 // Order handles the creation of a new order. It expects a JSON payload representing
@@ -18,7 +18,7 @@ import (
 // 4. Adds the order to the database using the dao.AddOrder function.
 // 5. Returns a JSON response indicating success or failure.
 //
-// If any step fails, it returns a JSON response with an appropriate error message
+// If any step fails, it returns a JSON response with an appropriate info message
 // and HTTP status code.
 //
 // Parameters:
@@ -28,34 +28,42 @@ import (
 //
 //	{
 //	  "info": "success",
-//	  "status": 10000,
+//	  "status": config.SuccessCode,
 //	  "order_id": 123
 //	}
 //
-// Example response on error:
+// Example response on info:
 //
 //	{
-//	  "error": "error message"
+//	  "info": "info message"
 //	}
 func Order(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	claims, err := utils.ParseToken(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": config.TokenErrCode,
+			"info":   err.Error()})
 	}
 	var order model.Order
 	if err = c.BindJSON(&order); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
 		return
 	}
 	if order.UserID != claims.ID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "用户ID不匹配"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   "用户ID不匹配"})
 		return
 	}
 	err = dao.AddOrder(&order)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": config.DataBaseErrCode,
+			"info":   err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"info": "success", "status": 10000, "order_id": order.ID})
+	c.JSON(http.StatusCreated, gin.H{"info": "success", "status": config.SuccessCode, "data": gin.H{"order_id": order.ID}})
 }
