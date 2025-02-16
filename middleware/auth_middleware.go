@@ -36,7 +36,7 @@ func AuthMiddleware() gin.HandlerFunc {
 				"info":   "Token expired"})
 			c.Abort()
 			return
-		} else if claims.Issuer != config.Issuer || claims.Subject != claims.Username {
+		} else if claims.Issuer != config.Issuer || claims.Subject != claims.Username || claims == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"status": config.TokenErrCode,
 				"info":   "Invalid token"})

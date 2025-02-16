@@ -30,7 +30,15 @@ func Search(c *gin.Context) { //搜索商品
 			"status": config.TokenErrCode,
 			"info":   "token验证错误"})
 	}
-	user := model.User{ID: claims.ID, Username: claims.Username}
+	var user model.User
+	if claims != nil {
+		user = model.User{ID: claims.ID, Username: claims.Username}
+	} else {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": config.TokenErrCode,
+			"info":   "token出错",
+		})
+	}
 	existingUser, isTrue := dao.FindUser(&user)
 	if !existingUser {
 		c.JSON(http.StatusNotFound, gin.H{
