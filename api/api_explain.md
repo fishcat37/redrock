@@ -23,17 +23,18 @@
 ```
 **状态码**:
 ```
-    UserNotExistCode  = 1001	//用户不存在
-	PasswordWrongCode    = 1002	//密码错误
-	UserExistCode    = 1003		//用户已存在
-	DataBaseErrCode  = 1004		//数据库操作错误
-	MakeTokenErrCode = 1005		//生成token错误
-	TokenErrCode     = 1006		//token错误
-	RequestErrCode   = 1007		//请求错误
-	ProductNotExistCode = 1008	//商品不存在
-	CartNotExistCode    = 1009	//购物车不存在
-	NotCommentsCode     = 1010	//没有评论
-	SuccessCode      = 10000	//成功
+    UserNotExistCode    = 1001  //用户不存在
+	  PasswordWrongCode   = 1002  //密码错误
+	  UserExistCode       = 1003  //用户已存在
+	  DataBaseErrCode     = 1004  //数据库操作错误
+	  MakeTokenErrCode    = 1005  //生成token错误
+	  TokenErrCode        = 1006  //token错误
+	  RequestErrCode      = 1007  //请求错误
+	  ProductNotExistCode = 1008  //商品不存在
+	  CartNotExistCode    = 1009  //购物车不存在
+	  NotCommentsCode     = 1010  //没有评论
+	  GetIDFailed         = 1011  //获取ID失败
+	  SuccessCode         = 10000 //成功
 
 ```
 ---
@@ -155,7 +156,7 @@
 |telephone      | string | 否   | 电话号码               |
 |email          | string | 否   | 邮箱                   |
 |qq| string | 否 | QQ号码 |
-|gener| string | 否 | 性别 |
+|gender| string | 否 | 性别 |
 |birthday| string | 否 | 生日 |
 **返回示例**:
 ```json
@@ -300,11 +301,11 @@
 ---
 
 ### 12. 获取分类商品列表
-**请求路径**: `GET /product/[type]`  
+**请求路径**: `GET /product/type`  
 **请求参数**:
 | 名称       | 位置   | 类型   | 必选 | 说明     |
 |------------|--------|--------|------|----------|
-| type       | path   | string | 是   | 商品分类 |
+| type       | query  | string | 是   | 商品分类 |
 
 **返回参数**:
 | 字段名     | 类型    | 说明       |
@@ -404,14 +405,17 @@
 ---
 
 ### 16. 更新评论
+
 **请求路径**: `PUT /comment/[comment_id]`  
 **请求头**: `Authorization: [token]`  
 **请求参数**: `application/json`
+
 | 名称       | 类型   | 必选 | 说明     |
 |------------|--------|------|----------|
 | content    | string | 是   | 新评论内容 |
 
 **返回示例**:
+
 ```json
 {
   "status": 10000,
@@ -422,15 +426,18 @@
 ---
 
 ### 17. 点赞/点踩
+
 **请求路径**: `PUT /comment/praise`  
 **请求头**: `Authorization: [token]`  
 **请求参数**: `application/json`
+
 | 名称         | 类型   | 必选 | 说明                     |
 |--------------|--------|------|--------------------------|
 | comment_id   | string | 是   | 评论ID                   |
 | model        | int    | 是   | 1-点赞，2-点踩           |
 
 **返回示例**:
+
 ```json
 {
   "status": 10000,
@@ -440,24 +447,29 @@
 
 ---
 
-## 操作相关接口
+## 下单相关接口
 
 ### 18. 下单
+
 **请求路径**: `POST /operate/order`  
 **请求头**: `Authorization: [token]`  
 **请求参数**: `application/form-data`
+
 | 名称       | 类型   | 必选 | 说明       |
 |------------|--------|------|------------|
 | user_id    | string | 是   | 用户ID     |
 | orders     | array  | 是   | 订单商品   |
+| address    | string | 是   | 地址       |
 | total      | float  | 是   | 订单总价   |
 
 **返回参数**:
+
 | 字段名     | 类型   | 说明     |
 |------------|--------|----------|
 | order_id   | string | 订单ID   |
 
 **返回示例**:
+
 ```json
 {
   "status": 10000,
@@ -469,3 +481,136 @@
 ```
 
 ---
+
+### 19. 获取订单信息
+
+**请求路径**: `GET /operate/order/[order_id]`
+**请求头**: `Authorization: [token]`
+**请求参数**: `application/json`
+
+| 名称       | 类型   | 必选 | 说明       |
+|------------|--------|------|------------|
+| user_id   | string | 是   | 用户ID     |
+
+**返回参数**:
+
+| 字段名     | 类型   | 说明     |
+|------------|--------|----------|
+| id   | string | 订单ID   |
+| user_id   | string | 用户ID   |
+| orders   | array | 订单商品   |
+|address   | string | 地址   |
+|total   | float | 总价   |
+
+**返回示例**:
+
+```json
+{
+  "status": 10000,
+  "info": "success",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "orders": [
+      {
+        "product_id": "1",
+        "name": "傲慢与偏见",
+        "price": 9.8
+      }
+    ],
+    "address": "广东省广州市",
+    "total": 9.8
+  }
+}
+```
+
+---
+
+### 20. 获取订单列表
+
+**请求路径**: `GET /operate/order/list/[user_id]`
+**请求头**: `Authorization: [token]`
+**请求参数**:
+
+**返回参数**:
+
+| 字段名     | 类型   | 说明     |
+|------------|--------|----------|
+| orders   | array | 订单列表   |
+
+**返回示例**:
+
+```json
+{
+  "status": 10000,
+  "info": "success",
+  "data": {
+    "orders": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "orders": [
+          {
+            "product_id": "1",
+            "name": "傲慢与偏见",
+            "price": 9.8
+          }
+        ],
+        "address": "广东省广州市",
+        "total": 9.8
+      }
+    ]
+  }
+}
+```
+
+---
+
+
+### 21. 删除订单
+
+**请求路径**: `DELETE /operate/order/delete`
+**请求头**: `Authorization: [token]`
+**请求参数**: `application/json`
+
+| 名称       | 类型   | 必选 | 说明       |
+|------------|--------|------|------------|
+| order_id   | string | 是   | 订单ID     |
+| user_id   | string | 是   | 用户ID     |
+
+**返回参数**:
+
+**返回示例**:
+
+```json
+{
+  "status": 10000,
+  "info": "success"
+}
+```
+
+---
+
+### 22. 更新订单收货地址
+
+**请求路径**: `PUT /operate/order/update`
+**请求头**: `Authorization: [token]`
+**请求参数**: `application/json`
+
+| 名称       | 类型   | 必选 | 说明       |
+|------------|--------|------|------------|
+| order_id   | string | 是   | 订单ID     |
+| user_id   | string | 是   | 用户ID     |
+|address   | string | 是   | 地址信息     |
+
+仅支持更改地址
+
+**返回参数**:
+**返回示例**:
+
+```json
+{
+  "status": 10000,
+  "info": "success"
+}
+```

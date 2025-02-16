@@ -10,6 +10,6 @@ type Comment struct {
 	Avatar      string    `json:"avatar"`
 	NickName    string    `json:"nickname"`
 	PraiseCount int       `json:"praise_count"`
-	IsPraised   int       `json:"is_praised"`
-	ProductID   uint      `json:"product_id" uri:"product_id"`
+	//IsPraised   int       `json:"is_praised"`
+	ProductID uint `json:"product_id" uri:"product_id"`
 }

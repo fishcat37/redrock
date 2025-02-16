@@ -11,5 +11,6 @@ const (
 	ProductNotExistCode = 1008  //商品不存在
 	CartNotExistCode    = 1009  //购物车不存在
 	NotCommentsCode     = 1010  //没有评论
+	GetIDFailed         = 1011  //获取ID失败
 	SuccessCode         = 10000 //成功
 )

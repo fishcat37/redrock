@@ -29,9 +29,9 @@ func AddComment(comment *model.Comment) error {
 }
 
 func DeleteComment(comment model.Comment) error {
-	result := DB.Model(&model.Comment{}).Where("id = ?", comment.ID).Delete(&comment)
+	result := DB.Model(&model.Comment{}).Where("id = ? AND user_id = ?", comment.ID, comment.UserID).Delete(&comment)
 	if result.RowsAffected == 0 {
-		return fmt.Errorf(fmt.Sprintf("comment %v does not exist", comment.ID))
+		return fmt.Errorf(fmt.Sprintf("your comment %v does not exist", comment.ID))
 	}
 	return result.Error
 }

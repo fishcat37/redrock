@@ -6,7 +6,6 @@ import (
 	"redrock/config"
 	"redrock/dao"
 	"redrock/model"
-	"redrock/utils"
 )
 
 // Order handles the creation of a new order. It expects a JSON payload representing
@@ -38,27 +37,32 @@ import (
 //	  "info": "info message"
 //	}
 func Order(c *gin.Context) {
-	token := c.GetHeader("Authorization")
-	claims, err := utils.ParseToken(token)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status": config.TokenErrCode,
-			"info":   err.Error()})
+	//token := c.GetHeader("Authorization")
+	//claims, err := utils.ParseToken(token)
+	//if err != nil {
+	//	c.JSON(http.StatusUnauthorized, gin.H{
+	//		"status": config.TokenErrCode,
+	//		"info":   err.Error()})
+	//}
+	id, get := c.Get("ID")
+	if !get {
+		c.JSON(http.StatusBadRequest, gin.H{"status": config.GetIDFailed, "error": "获取ID失败"})
+		return
 	}
 	var order model.Order
-	if err = c.BindJSON(&order); err != nil {
+	if err := c.BindJSON(&order); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": config.RequestErrCode,
 			"info":   err.Error()})
 		return
 	}
-	if order.UserID != claims.ID {
+	if order.UserID != id.(uint) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": config.RequestErrCode,
 			"info":   "用户ID不匹配"})
 		return
 	}
-	err = dao.AddOrder(&order)
+	err := dao.AddOrder(&order)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": config.DataBaseErrCode,
@@ -66,4 +70,135 @@ func Order(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"info": "success", "status": config.SuccessCode, "data": gin.H{"order_id": order.ID}})
+}
+
+func GetOrder(c *gin.Context) {
+	//token := c.GetHeader("Authorization")
+	//claims, err := utils.ParseToken(token)
+	//if err != nil {
+	//	c.JSON(http.StatusUnauthorized, gin.H{
+	//		"status": config.TokenErrCode,
+	//		"info":   err.Error()})
+	//}
+	id, get := c.Get("ID")
+	if !get {
+		c.JSON(http.StatusBadRequest, gin.H{"status": config.GetIDFailed, "info": "获取ID失败"})
+		return
+	}
+	var order model.Order
+	if err := c.ShouldBindUri(&order); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
+	order.UserID = id.(uint)
+	//if err := c.ShouldBindJSON(&order); err != nil {
+	//	c.JSON(http.StatusBadRequest, gin.H{
+	//		"status": config.RequestErrCode,
+	//		"info":   err.Error()})
+	//	return
+	//}
+	//if order.UserID != id {
+	//	c.JSON(http.StatusBadRequest, gin.H{
+	//		"status": config.RequestErrCode,
+	//		"info":   "用户ID不匹配"})
+	//	return
+	//}
+	err := dao.GetOrder(&order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": config.DataBaseErrCode,
+			"info":   err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"info": "success", "status": config.SuccessCode, "data": order})
+}
+
+func GetOrderList(c *gin.Context) {
+	id, get := c.Get("ID")
+	if !get {
+		c.JSON(http.StatusBadRequest, gin.H{"status": config.GetIDFailed, "error": "获取ID失败"})
+		return
+	}
+	var order model.Order
+	if err := c.ShouldBindUri(&order); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
+	if id != order.UserID {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   "用户ID不匹配"})
+		return
+	}
+	var orderList []model.Order
+	err := dao.GetOrderList(&orderList, order.UserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": config.DataBaseErrCode,
+			"info":   err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"info": "success", "status": config.SuccessCode, "data": orderList})
+}
+
+func UpdateOrder(c *gin.Context) {
+	id, get := c.Get("ID")
+	if !get {
+		c.JSON(http.StatusBadRequest, gin.H{"status": config.GetIDFailed, "error": "获取ID失败"})
+		return
+	}
+	var order model.Order
+	if err := c.ShouldBindJSON(&order); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
+	if order.UserID != id {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   "用户ID不匹配"})
+		return
+	}
+	err := dao.UpdateOrder(order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": config.DataBaseErrCode,
+			"info":   err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"info": "success", "status": config.SuccessCode})
+}
+
+func DeleteOrder(c *gin.Context) {
+	id, get := c.Get("ID")
+	if !get {
+		c.JSON(http.StatusBadRequest, gin.H{"status": config.GetIDFailed, "error": "获取ID失败"})
+		return
+	}
+	var order model.Order
+	if err := c.ShouldBindJSON(&order); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
+	if order.UserID != id {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   "用户ID不匹配"})
+		return
+	}
+	err := dao.DeleteOrder(&order)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": config.DataBaseErrCode,
+			"info":   err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"info": "success", "status": config.SuccessCode})
 }

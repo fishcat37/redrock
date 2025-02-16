@@ -1,13 +1,12 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"redrock/config"
 	"redrock/dao"
 	"redrock/model"
 	"redrock/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 func GetComment(c *gin.Context) {
@@ -48,6 +47,12 @@ func AddComment(c *gin.Context) {
 	}
 	var comment model.Comment
 	//var product model.Product
+	if err := c.BindUri(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
 	if err := c.BindJSON(&comment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": config.RequestErrCode,
@@ -109,6 +114,12 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 	var comment model.Comment
+	if err := c.BindUri(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": config.RequestErrCode,
+			"info":   err.Error()})
+		return
+	}
 	if err := c.BindJSON(&comment); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": config.RequestErrCode,

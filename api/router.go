@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"redrock/middleware"
 	"redrock/service"
 )
 
@@ -9,7 +10,7 @@ func Router(r *gin.Engine) {
 	user := r.Group("/user")
 	{
 		user.POST("/register", service.Register)
-		user.POST("/token", service.Token)
+		user.GET("/token", service.Token)
 		user.GET("/token/refresh", service.Refresh)
 		user.PUT("/password", service.Password)
 		user.GET("/info/:user_id", service.GetInfo)
@@ -22,7 +23,7 @@ func Router(r *gin.Engine) {
 		product.PUT("/AddCart", service.AddCart)
 		product.GET("/cart", service.Cart)
 		product.GET("/info/:product_id", service.GetProductInfo)
-		product.GET("/:type", service.GetInfoByType)
+		product.GET("/type", service.GetInfoByType)
 	}
 	comment := r.Group("/comment")
 	{
@@ -32,5 +33,13 @@ func Router(r *gin.Engine) {
 		comment.PUT("/:comment_id", service.UpdateComment)
 		comment.PUT("/praise", service.Praise)
 	}
-	r.POST("operate/order", service.Order)
+	order := r.Group("/operate", middleware.AuthMiddleware())
+	{
+		order.POST("/order", service.Order)
+		order.GET("/:order_id", service.GetOrder)
+		order.GET("/list/:user_id", service.GetOrderList)
+		order.DELETE("/delete", service.DeleteOrder)
+		order.PUT("/update", service.UpdateOrder)
+	}
+
 }

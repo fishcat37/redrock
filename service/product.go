@@ -156,7 +156,7 @@ func GetProductInfo(c *gin.Context) {
 
 func GetInfoByType(c *gin.Context) {
 	var product model.Product
-	if err := c.BindUri(&product); err != nil {
+	if err := c.BindQuery(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": config.RequestErrCode,
 			"info":   err.Error()})

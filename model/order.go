@@ -3,9 +3,9 @@ package model
 import "time"
 
 type Order struct {
-	ID       uint             `gorm:"primary_key"`
-	UserID   uint             `json:"user_id"`
-	Products []OrderedProduct `json:"orders" gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ID       uint             `gorm:"primary_key" uri:"order_id" json:"id"`
+	UserID   uint             `json:"user_id" uri:"user_id"`
+	Products []OrderedProduct `json:"orders" gorm:"foreignKey:OrderID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Address  string           `json:"address"`
 	Total    uint             `json:"total"`
 }

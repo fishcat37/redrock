@@ -1,14 +1,12 @@
 package service
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"redrock/config"
 	"redrock/dao"
 	"redrock/model"
 	"redrock/utils"
-	// "time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Context) {
