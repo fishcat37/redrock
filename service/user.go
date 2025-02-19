@@ -81,7 +81,7 @@ func Token(c *gin.Context) {
 
 func Refresh(c *gin.Context) {
 	var myToken model.Token
-	myToken.Token = c.GetHeader("Authorization")
+	//myToken.Token = c.GetHeader("Authorization")
 	if err := c.BindJSON(&myToken); err != nil {
 		return
 	}

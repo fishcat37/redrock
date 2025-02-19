@@ -23,7 +23,7 @@ func Router(r *gin.Engine) {
 		product.PUT("/addCart", service.AddCart)
 		product.GET("/cart", service.Cart)
 		product.GET("/info/:product_id", service.GetProductInfo)
-		product.GET("/type", service.GetInfoByType)
+		product.GET("/type", middleware.AuthMiddleware(), service.GetInfoByType)
 	}
 	comment := r.Group("/comment")
 	{

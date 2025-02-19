@@ -40,7 +40,7 @@ func FindByID(user *model.User) bool {
 	return true
 }
 func UpdateUser(user *model.User) error {
-	result := DB.Model(user).Where("username = ?", user.Username).Updates(user)
+	result := DB.Model(user).Where("username = ?", user.Username).Omit("password").Updates(user)
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("don't have this user")
 	}
